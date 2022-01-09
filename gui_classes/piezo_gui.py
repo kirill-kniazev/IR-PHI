@@ -17,9 +17,9 @@ from madpiezo import Madpiezo
 import numpy as np
 from time import sleep, time
 import re
-# import Firefly_SW #192.168.1.229, separate py file
-# import Firefly_LW #192.168.1.231, , separate py file
-# import zhinst.ziPython, zhinst.utils
+import Firefly_SW #192.168.1.229
+import Firefly_LW #192.168.1.231
+import zhinst.ziPython, zhinst.utils
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
