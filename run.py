@@ -21,7 +21,7 @@ def on_closing():
 
 try:
     root = tk.Tk()
-    root.iconphoto(False, tk.PhotoImage(file=_parent_dir + "\images\laser.png"))
+    root.iconphoto(False, tk.PhotoImage(file=_parent_dir + "/images/laser.png"))
     root.title("Laser/Piezo manipulator")
     root.resizable(0, 0)
     # root.geometry("250x450")
