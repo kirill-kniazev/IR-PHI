@@ -67,7 +67,7 @@ class PiezoManipulation(tk.Frame):
         self.rowconfigure(1, weight=1)
         
         #* IMAGES
-        self.logo = tk.PhotoImage(file=_parent_dir + "/images/path22064.png")
+        self.logo = tk.PhotoImage(file=_parent_dir + "\images\path22064.png")
         
         #!+++++++++++++++++++++++ GUI DESCRIPTION +++++++++++++++++++++++++++++
                 
