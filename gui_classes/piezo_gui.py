@@ -915,9 +915,8 @@ as fast as it can while disabling\nsome tracking functions and emergency abort")
         Hovertip(self.initialize_button, "Press this button first\nto initialize \
 hardware and software")
                 
-
         #*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        
+
         # list of buttons to be disabled while experiment is in progress
         self.buttons = [self.apply_parameters_button_fr_im, 
                         self.apply_parameters_button_fr_sp,
@@ -1490,20 +1489,20 @@ Documents\\Measurements\\Spectra\\"
         # check if there is something to plot from checkbuttons
         need_plot_r = self.plot_r_var_fr_im.get()
         need_plot_theta = self.plot_theta_var_fr_im.get()
+
+        # initialize min and max value for cmap real-time updating
+        min_r_value = 1000
+        min_theta_value = 1000
+        
+        max_r_value = -100
+        max_theta_value = -100
+        
+        # initialize values for first plot
+        r_value = 0
+        theta_deg = 0
         
         # plot both R and Theta
         if need_plot_r and need_plot_theta:
-            
-            # initialize min and max value for cmap real-time updating
-            min_r_value = 1000
-            min_theta_value = 1000
-            
-            max_r_value = -100
-            max_theta_value = -100
-            
-            # initialize values for first plot
-            r_value = 0
-            theta_deg = 0
             
             plot_r, plot_theta, fig, ax, bg = self.imag_plot_initialize(1, 1, 
                                                            interpolation="None",
@@ -1512,26 +1511,12 @@ Documents\\Measurements\\Spectra\\"
         # plot R only   
         elif need_plot_r:
             
-            # initialize min and max value for cmap real-time updating
-            min_r_value = 1000
-            max_r_value = -100
-            
-            # initialize value for first plot
-            r_value = 0
-            
             plot_r, fig, ax, bg = self.imag_plot_initialize(1, 0,
                                                     interpolation="None",
                                                     cmap="jet")
             
         # plot Theta only
         elif need_plot_theta:
-            
-            # initialize min and max value for cmap real-time updating
-            min_theta_value = 1000
-            max_theta_value = -100
-            
-            # initialize value for first plot
-            theta_deg = 0
             
             plot_r, fig, ax, bg = self.imag_plot_initialize(0, 1,
                                                     interpolation="None",
@@ -1546,6 +1531,9 @@ Documents\\Measurements\\Spectra\\"
                 t1 = time() # start time
                 
                 if self.fast_mode_var.get() == 0:
+
+                    # change value in progress bar 
+                    self.imag_prog_bar_fr_im["value"] = prog_bar_values[step]
                     self.read_position() # read current position
                     self.update()  
                     if self.break_loop:
@@ -1553,12 +1541,6 @@ Documents\\Measurements\\Spectra\\"
                 
                 # invert index to fill array from the bottom to the top
                 index_im = scan_shape[0] - 1 - index[0], index[1] 
-                
-                if self.fast_mode_var.get() == 0:
-                    
-                    # change value in progress bar 
-                    self.imag_prog_bar_fr_im["value"] = prog_bar_values[step]
-                    # self.update_idletasks() # try to update prog bar
 
                 # go to the next position and read position
                 self.piezo.goxy(self.x_pattern[index], self.y_pattern[index])
@@ -2011,8 +1993,11 @@ On average {round(total_time_min * 1000 * 60 / scan_shape, 2)} ms per step.")
             #     showerror(message="Error stopping piezo after imaging!")
 
 
-    ## CHECKS WHETHER SPEC PARAMETERS ARE GOOD
     def is_spec_param_good(self, wavenum1, wavenum2, delta_wavenum):
+        """
+        Checks if spactra parameters are good.
+        
+        """
         wavenum1_bool = self.WAVENUM_LEFT_BORDER <= wavenum1 <= self.WAVENUM_RIGHT_BORDER
         wavenum2_bool = wavenum1 < wavenum2 <= self.WAVENUM_RIGHT_BORDER
         delta_wavenum_bool = 0 < (wavenum2 - wavenum1)
@@ -2020,9 +2005,14 @@ On average {round(total_time_min * 1000 * 60 / scan_shape, 2)} ms per step.")
         total_bool = (wavenum1_bool * wavenum2_bool * delta_wavenum_bool)
         return total_bool
     
-    
-    ## READ CURRENT WAVELENGTH
+
     def read_current_wavelength(self, ff3, final_wavenumber=None):
+        """
+        Read and write current wavenumber. If <final_wavenumber> is not None,
+        then some gui elements will be disabled till current wavenumber is not
+        equal <final_wavenumber>.
+        
+        """
         try:
             pattern = r"\"current_wavelength\":\[(\d+\.\d+)\]"
             status = ff3.wavelength_status()
