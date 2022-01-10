@@ -17,9 +17,9 @@ from madpiezo import Madpiezo
 import numpy as np
 from time import sleep, time
 import re
-# import Firefly_SW #192.168.1.229
-# import Firefly_LW #192.168.1.231
-# import zhinst.ziPython, zhinst.utils
+import Firefly_SW #192.168.1.229
+import Firefly_LW #192.168.1.231
+import zhinst.ziPython, zhinst.utils
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -67,7 +67,7 @@ class PiezoManipulation(tk.Frame):
         self.rowconfigure(1, weight=1)
         
         #* IMAGES
-        self.logo = tk.PhotoImage(file=_parent_dir + "/images/path22064.png")
+        self.logo = tk.PhotoImage(file=_parent_dir + "\images\path22064.png")
         
         #!+++++++++++++++++++++++ GUI DESCRIPTION +++++++++++++++++++++++++++++
                 
@@ -915,8 +915,9 @@ as fast as it can while disabling\nsome tracking functions and emergency abort")
         Hovertip(self.initialize_button, "Press this button first\nto initialize \
 hardware and software")
                 
-        #*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+        #*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
         # list of buttons to be disabled while experiment is in progress
         self.buttons = [self.apply_parameters_button_fr_im, 
                         self.apply_parameters_button_fr_sp,
@@ -1341,6 +1342,7 @@ Documents\\Measurements\\Spectra\\"
             # fig.colorbar(plot_theta)
             
             plt.pause(0.05)
+            plt.tight_layout()
             plt.show(block=False)
             bg = fig.canvas.copy_from_bbox(fig.bbox)
             ax.draw_artist(plot_theta)
@@ -1362,7 +1364,7 @@ Documents\\Measurements\\Spectra\\"
         if self.initialized: # if piezo initialized
             try:    
                 # read scan area parameters
-                z = round( float(self.z_spin_fr_im.get()), 2)
+                self.z = round( float(self.z_spin_fr_im.get()), 2)
                 
                 # "self" for variables that will be used elsewhere
                 self.x1 = round( float(self.x1_spin_fr_im.get()), 2)
@@ -1388,7 +1390,7 @@ Documents\\Measurements\\Spectra\\"
                 showerror(message="Error while reading lock-in parameters!")
                 return -1
                         
-            scan_param_bool = self.is_imag_param_good(z, 
+            scan_param_bool = self.is_imag_param_good(self.z, 
                                                       self.x1,
                                                       self.y1, 
                                                       self.x2, 
@@ -1433,9 +1435,6 @@ Documents\\Measurements\\Spectra\\"
                                                                      self.y2, 
                                                                      len_y))
             
-            # go to the initial position of the scan
-            # self.piezo_go_to_position(self.x1, self.y1, z)
-            
             wavenum = int(self.scan_wavenumber_spin_fr_im.get())
             
             # go to initial wavelength
@@ -1466,6 +1465,9 @@ Documents\\Measurements\\Spectra\\"
         
         """      
         
+        # go to the initial position of the scan
+        self.piezo_go_to_position(self.x1, self.y1, self.z)
+
         # make buttons disabled
         self.go_button_lf1.configure(state="disabled")
         self.go_to_origin_button_lf1.configure(state="disabled")
@@ -1489,20 +1491,20 @@ Documents\\Measurements\\Spectra\\"
         # check if there is something to plot from checkbuttons
         need_plot_r = self.plot_r_var_fr_im.get()
         need_plot_theta = self.plot_theta_var_fr_im.get()
-
-        # initialize min and max value for cmap real-time updating
-        min_r_value = 1000
-        min_theta_value = 1000
-        
-        max_r_value = -100
-        max_theta_value = -100
-        
-        # initialize values for first plot
-        r_value = 0
-        theta_deg = 0
         
         # plot both R and Theta
         if need_plot_r and need_plot_theta:
+            
+            # initialize min and max value for cmap real-time updating
+            min_r_value = 1000
+            min_theta_value = 1000
+            
+            max_r_value = -100
+            max_theta_value = -100
+            
+            # initialize values for first plot
+            r_value = 0
+            theta_deg = 0
             
             plot_r, plot_theta, fig, ax, bg = self.imag_plot_initialize(1, 1, 
                                                            interpolation="None",
@@ -1511,6 +1513,13 @@ Documents\\Measurements\\Spectra\\"
         # plot R only   
         elif need_plot_r:
             
+            # initialize min and max value for cmap real-time updating
+            min_r_value = 1000
+            max_r_value = -100
+            
+            # initialize value for first plot
+            r_value = 0
+            
             plot_r, fig, ax, bg = self.imag_plot_initialize(1, 0,
                                                     interpolation="None",
                                                     cmap="jet")
@@ -1518,7 +1527,14 @@ Documents\\Measurements\\Spectra\\"
         # plot Theta only
         elif need_plot_theta:
             
-            plot_r, fig, ax, bg = self.imag_plot_initialize(0, 1,
+            # initialize min and max value for cmap real-time updating
+            min_theta_value = 1000
+            max_theta_value = -100
+            
+            # initialize value for first plot
+            theta_deg = 0
+            
+            plot_theta, fig, ax, bg = self.imag_plot_initialize(0, 1,
                                                     interpolation="None",
                                                     cmap="jet")
             
@@ -1531,9 +1547,6 @@ Documents\\Measurements\\Spectra\\"
                 t1 = time() # start time
                 
                 if self.fast_mode_var.get() == 0:
-
-                    # change value in progress bar 
-                    self.imag_prog_bar_fr_im["value"] = prog_bar_values[step]
                     self.read_position() # read current position
                     self.update()  
                     if self.break_loop:
@@ -1541,6 +1554,12 @@ Documents\\Measurements\\Spectra\\"
                 
                 # invert index to fill array from the bottom to the top
                 index_im = scan_shape[0] - 1 - index[0], index[1] 
+                
+                if self.fast_mode_var.get() == 0:
+                    
+                    # change value in progress bar 
+                    self.imag_prog_bar_fr_im["value"] = prog_bar_values[step]
+                    # self.update_idletasks() # try to update prog bar
 
                 # go to the next position and read position
                 self.piezo.goxy(self.x_pattern[index], self.y_pattern[index])
@@ -1684,11 +1703,12 @@ Documents\\Measurements\\Spectra\\"
                 
                 fig.canvas.blit(fig.bbox)
                 fig.canvas.flush_events()
+
+                plt.tight_layout()
+                plt.show()
             
             # plot R
             elif need_plot_r:
-                
-                fig.colorbar(plot_r)
                 
                 fig.canvas.restore_region(bg)
                 
@@ -1701,14 +1721,18 @@ Documents\\Measurements\\Spectra\\"
                 plot_r.set_clim(min_r_value, max_r_value) 
                 
                 ax.draw_artist(plot_r)
+
+                divider = make_axes_locatable(ax)
+                cax = divider.append_axes("right", size="5%", pad=0.3)
+                fig.colorbar(plot_r, cax=cax, orientation='vertical')
                 
                 fig.canvas.blit(fig.bbox)
-                fig.canvas.flush_events() 
+                fig.canvas.flush_events()
+
+                plt.show()
             
             # plot Theta
             elif need_plot_theta:
-                
-                fig.colorbar(plot_theta)
                 
                 fig.canvas.restore_region(bg)
                 
@@ -1720,9 +1744,15 @@ Documents\\Measurements\\Spectra\\"
                 plot_theta.set_clim(min_theta_value, max_theta_value)
                 
                 ax.draw_artist(plot_theta)
+
+                divider = make_axes_locatable(ax)
+                cax = divider.append_axes("right", size="5%", pad=0.3)
+                fig.colorbar(plot_theta, cax=cax, orientation='vertical')
                 
                 fig.canvas.blit(fig.bbox)
                 fig.canvas.flush_events()
+
+                plt.show()
     
             
             print(f"\n\nDone! For {length} steps it took {round(total_time_min, 2)} min.\
@@ -1861,21 +1891,16 @@ On average {round(total_time_min * 1000 * 60 / length, 2)} ms per step.")
             # initialize value for first plot
             r_value = 0
 
+            plt.ion()
             fig, ax = plt.subplots() # for R 
             ax.set_title("IR absorption Chart")
             ax.set_xlabel("ν, cm⁻¹")
             ax.set_ylabel("IR absorption")
             ax.grid(visible=True)
+            # ax.set_yticks([]) 
 
-            (plot_r, ) = ax.plot(self.wavenum_pattern, r_data, animated=True)
-            
-            plt.show(block=False)
-            
-            plt.pause(0.05)
-            bg = fig.canvas.copy_from_bbox(fig.bbox)
-            ax.draw_artist(plot_r)
-            fig.canvas.blit(fig.bbox)
-            
+            (plot_r, ) = ax.plot(self.wavenum_pattern, r_data)
+                 
         
         total_time_min = 0 # for time accumulation 
         
@@ -1902,19 +1927,16 @@ On average {round(total_time_min * 1000 * 60 / length, 2)} ms per step.")
                 # plot R    
                 if need_plot_r:
                     
-                    fig.canvas.restore_region(bg)
-                    
                     plot_r.set_ydata(r_data)
                     
                     if r_value < min_r_value : min_r_value = r_value
                     if r_value > max_r_value : max_r_value = r_value
 
-                    ax.set_ylim(min_r_value, max_r_value)    
-                    
-                    ax.draw_artist(plot_r)
-                    
-                    fig.canvas.blit(fig.bbox)
+                    ax.set_ylim(min_r_value, max_r_value) 
+                    fig.canvas.draw()
                     fig.canvas.flush_events()
+
+                    
                 
                 # maybe not needed
                 # sleep(self.INTEGRATION_TIME_SPECTRA) # some pause
@@ -1952,39 +1974,41 @@ On average {round(total_time_min * 1000 * 60 / length, 2)} ms per step.")
         # show static image when loop is over   
         if self.break_loop == False:
             if need_plot_r:
-                
-                fig.canvas.restore_region(bg)
 
                 # set new data
                 plot_r.set_ydata(r_data)
                 
                 if r_value < min_r_value : min_r_value = r_value
                 if r_value > max_r_value : max_r_value = r_value
-                ax.set_ylim(min_r_value, max_r_value)    
-                
-                ax.draw_artist(plot_r)               
-                fig.canvas.blit(fig.bbox)
+                ax.set_ylim(min_r_value, max_r_value) 
+
+                fig.canvas.draw()
                 fig.canvas.flush_events()
+
+                plt.ioff()
+                plt.show()
+
+                
         
-            print(f"Done! For {scan_shape} steps it took {round(total_time_min, 2)} min.\
+        print(f"Done! For {scan_shape} steps it took {round(total_time_min, 2)} min.\
 On average {round(total_time_min * 1000 * 60 / scan_shape, 2)} ms per step.")
-            
-            # to reset laser wavelength
-            initial_wavenum = self.wavenum_pattern[0]
-            self.ff3.go_to_wavelength(initial_wavenum)
-            self.read_current_wavelength(self.ff3, final_wavenumber=initial_wavenum)
-            
-            # add R norm
-            r_data_norm = r_data / np.max(r_data)
-            
-            # data to save to file
-            self.data_save = np.transpose([self.wavenum_pattern, r_data, r_data_norm])
-            
-            # make "save" button active
-            self.save_but_lf5.configure(state="enable")
-            
-            # disable "theta" checkbutton when save
-            self.save_theta_checkbut_lf5.configure(state="disable")
+        
+        # to reset laser wavelength
+        initial_wavenum = self.wavenum_pattern[0]
+        self.ff3.go_to_wavelength(initial_wavenum)
+        self.read_current_wavelength(self.ff3, final_wavenumber=initial_wavenum)
+        
+        # add R norm
+        r_data_norm = r_data / np.max(r_data)
+        
+        # data to save to file
+        self.data_save = np.transpose([self.wavenum_pattern, r_data, r_data_norm])
+        
+        self.save_but_lf5.configure(state="enable")
+        self.take_time_lab_fr_im['text'] = ""
+        
+        # disable "theta" checkbutton when save
+        self.save_theta_checkbut_lf5.configure(state="disable")
 
             # maybe not needed
             # try:
@@ -1993,11 +2017,8 @@ On average {round(total_time_min * 1000 * 60 / scan_shape, 2)} ms per step.")
             #     showerror(message="Error stopping piezo after imaging!")
 
 
+    ## CHECKS WHETHER SPEC PARAMETERS ARE GOOD
     def is_spec_param_good(self, wavenum1, wavenum2, delta_wavenum):
-        """
-        Checks if spactra parameters are good.
-        
-        """
         wavenum1_bool = self.WAVENUM_LEFT_BORDER <= wavenum1 <= self.WAVENUM_RIGHT_BORDER
         wavenum2_bool = wavenum1 < wavenum2 <= self.WAVENUM_RIGHT_BORDER
         delta_wavenum_bool = 0 < (wavenum2 - wavenum1)
@@ -2005,14 +2026,9 @@ On average {round(total_time_min * 1000 * 60 / scan_shape, 2)} ms per step.")
         total_bool = (wavenum1_bool * wavenum2_bool * delta_wavenum_bool)
         return total_bool
     
-
+    
+    ## READ CURRENT WAVELENGTH
     def read_current_wavelength(self, ff3, final_wavenumber=None):
-        """
-        Read and write current wavenumber. If <final_wavenumber> is not None,
-        then some gui elements will be disabled till current wavenumber is not
-        equal <final_wavenumber>.
-        
-        """
         try:
             pattern = r"\"current_wavelength\":\[(\d+\.\d+)\]"
             status = ff3.wavelength_status()
