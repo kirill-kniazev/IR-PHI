@@ -1439,7 +1439,7 @@ Documents\\Measurements\\Spectra\\"
             
             # go to initial wavelength
             self.ff3.go_to_wavelength(wavenum)
-            self.read_current_wavelength(self.ff3, final_wavenumber=wavenum)
+            self.read_current_wavenumber(self.ff3, final_wavenumber=wavenum)
             
             # make "start imaging" button active
             self.start_button_fr_im.configure(state="enable")
@@ -1672,7 +1672,7 @@ Documents\\Measurements\\Spectra\\"
             
         if self.break_loop == False: 
             if need_plot_r and need_plot_theta:
-                #--------------------------------------------------------------
+
                 divider1 = make_axes_locatable(ax[0])
                 cax1 = divider1.append_axes("right", size="5%", pad=0.3)
                 
@@ -1682,7 +1682,6 @@ Documents\\Measurements\\Spectra\\"
                 # add colorbars to plots
                 fig.colorbar(plot_r, cax=cax1)
                 fig.colorbar(plot_theta, cax=cax2)
-                #--------------------------------------------------------------
                 fig.canvas.restore_region(bg)
                 
                 plot_r.set_data(self.r_data)
@@ -1838,7 +1837,7 @@ On average {round(total_time_min * 1000 * 60 / length, 2)} ms per step.")
             
             # go to initial wavelength
             self.ff3.go_to_wavelength(wavenum1)
-            self.read_current_wavelength(self.ff3, final_wavenumber=wavenum1)
+            self.read_current_wavenumber(self.ff3, final_wavenumber=wavenum1)
                   
             # make "start spectra" button active
             self.start_button_fr_sp.configure(state="enable")
@@ -1912,7 +1911,7 @@ On average {round(total_time_min * 1000 * 60 / length, 2)} ms per step.")
                 t1 = time() # start time
                 
                 if self.fast_mode_var.get() == 0:
-                    self.read_current_wavelength(self.ff3)
+                    self.read_current_wavenumber(self.ff3)
                 
                     # change value in progress bar 
                     self.spec_prog_bar_fr_sp["value"] = prog_bar_values[step]
@@ -1932,7 +1931,10 @@ On average {round(total_time_min * 1000 * 60 / length, 2)} ms per step.")
                     if r_value < min_r_value : min_r_value = r_value
                     if r_value > max_r_value : max_r_value = r_value
 
-                    ax.set_ylim(min_r_value, max_r_value) 
+                    # to broaden limits by 5%
+                    eps_min = 0.05 * min_r_value
+                    eps_max = 0.05 * max_r_value
+                    ax.set_ylim(min_r_value - eps_min, max_r_value + eps_max) 
                     fig.canvas.draw()
                     fig.canvas.flush_events()
 
@@ -1980,7 +1982,11 @@ On average {round(total_time_min * 1000 * 60 / length, 2)} ms per step.")
                 
                 if r_value < min_r_value : min_r_value = r_value
                 if r_value > max_r_value : max_r_value = r_value
-                ax.set_ylim(min_r_value, max_r_value) 
+
+                # to broaden limits by 5%
+                eps_min = 0.05 * min_r_value
+                eps_max = 0.05 * max_r_value
+                ax.set_ylim(min_r_value - eps_min, max_r_value + eps_max)
 
                 fig.canvas.draw()
                 fig.canvas.flush_events()
@@ -1996,7 +2002,7 @@ On average {round(total_time_min * 1000 * 60 / scan_shape, 2)} ms per step.")
         # to reset laser wavelength
         initial_wavenum = self.wavenum_pattern[0]
         self.ff3.go_to_wavelength(initial_wavenum)
-        self.read_current_wavelength(self.ff3, final_wavenumber=initial_wavenum)
+        self.read_current_wavenumber(self.ff3, final_wavenumber=initial_wavenum)
         
         # add R norm
         r_data_norm = r_data / np.max(r_data)
@@ -2017,8 +2023,11 @@ On average {round(total_time_min * 1000 * 60 / scan_shape, 2)} ms per step.")
             #     showerror(message="Error stopping piezo after imaging!")
 
 
-    ## CHECKS WHETHER SPEC PARAMETERS ARE GOOD
     def is_spec_param_good(self, wavenum1, wavenum2, delta_wavenum):
+        """
+        CHECKS WHETHER SPEC PARAMETERS ARE GOOD
+        
+        """
         wavenum1_bool = self.WAVENUM_LEFT_BORDER <= wavenum1 <= self.WAVENUM_RIGHT_BORDER
         wavenum2_bool = wavenum1 < wavenum2 <= self.WAVENUM_RIGHT_BORDER
         delta_wavenum_bool = 0 < (wavenum2 - wavenum1)
@@ -2027,8 +2036,11 @@ On average {round(total_time_min * 1000 * 60 / scan_shape, 2)} ms per step.")
         return total_bool
     
     
-    ## READ CURRENT WAVELENGTH
-    def read_current_wavelength(self, ff3, final_wavenumber=None):
+    def read_current_wavenumber(self, ff3, final_wavenumber=None):
+        """
+        Read and write current wavenumber.
+        
+        """
         try:
             pattern = r"\"current_wavelength\":\[(\d+\.\d+)\]"
             status = ff3.wavelength_status()
