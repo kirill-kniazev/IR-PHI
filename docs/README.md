@@ -11,6 +11,8 @@ A simple gui that manipulates infrared photothermal heterodyne imaging (IR-PHI) 
 
 To run gui correctly these python packages must be installed prior running from 'requirements.txt'
 
+.NET Framework 4.8 is required
+
 ## Running
 
 To run gui `run.py` (with console) or `run_no_console.pyw` (without console) files should be used.
@@ -19,8 +21,8 @@ To run gui `run.py` (with console) or `run_no_console.pyw` (without console) fil
 
 ### Imaging
 
-![Imaging](/images/Examples/imaging_2_speed_x3.gif "Imaging example, speed x3")
+![Imaging](/Examples/imaging_2_speed_x3.gif "Imaging example, speed x3")
 
 ### Spectroscopy
 
-![Spectroscopy](/images/Examples/spectroscopy_1_speed_x7.gif "Spectroscopy example, speed x7")
+![Spectroscopy](/Examples/spectroscopy_1_speed_x7.gif "Spectroscopy example, speed x7")
