@@ -1,50 +1,63 @@
 # IR-PHI laser manipulator
+<div align="center">
+    <img src="laser.png" width="35%">
+</div>
 
-A simple gui that manipulates infrared photothermal heterodyne imaging (IR-PHI) equipment (including piezo stage). More information about IR-PHI can be found [here](https://aip.scitation.org/doi/abs/10.1063/1.5142277).
+A simple GUI application that controls the infrared photothermal heterodyne imaging (IR-PHI) system. 
+
+More information about the IR-PHI [technique](https://aip.scitation.org/doi/abs/10.1063/1.5142277), [applications](https://pubs.acs.org/doi/abs/10.1021/acs.est.1c05181), and [image restoration](https://pubs.aip.org/aip/jcp/article-abstract/155/21/214202/199981/Deep-image-restoration-for-infrared-photothermal?redirectedFrom=fulltext) can be found on the [web](https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=ir-phi&btnG=).
 
 ## Features
-- Mad City piezo stage manipulation
-- IR-PHI imaging across predetermined area with real-time monitoring
-- Doing spectroscopy in predetermined point with real-time monitoring
+- **Imaging**: Capture infrared photothermal heterodyne imaging across a predetermined area with real-time monitoring.
+- **Spectroscopy**: Perform spectroscopy at specific points, with real-time monitoring of the process.
 
-## Dependecies
+These features are achieved through the control of the following components:
+- **Mad City Labs Piezo Micropositioning Stage**: Precise control over sample positioning for imaging and spectroscopy.
+- **M Squared Laser**: Control the wavelength of the laser for accurate and adjustable imaging conditions.
+- **Lock-in Amplifier**: Real-time signal readout and analysis for both imaging and spectroscopy applications.
 
-To run gui correctly these python packages must be installed prior running from 'requirements.txt'
+## Dependencies
 
-soft tested with python 3.8
+Before running the GUI, make sure to install the required Python packages from *requirements.txt*.
 
-connect to pieo stage. Mad City Labs: Nano Drive and Mad Piezo drivers has to be requested from the compeny.
+### Python Version:
+This software has been tested with *Python 3.8*.
 
-connect to the morror corection close loop motor.
-.NET Framework 4.8 is required https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48
-do not install clr from pip
-dont use clr packege
-pip uninstall clr
-pip install pythonnet (will not wirk), so install wheel manually:
-link for the wheel: https://www.lfd.uci.edu/~gohlke/pythonlibs/#pythonnet
-examples: 
-pip install C:\Users\kuno\Downloads\pythonnet-2.5.2-cp39-cp39-win_amd64.whl
-pip install C:\Users\kuno\Downloads\pythonnet-2.5.2-cp39-cp39-win32.whl
-masage from dev in 2022:
-It has been merged into master. We will not backport support for 3.10 (or 3.9) back to the current stable version. 
-You can install the prerelease using pip install --pre pythonnet.
+### Required Drivers and Software:
 
-connect to lockin aplifuer. NI visa has to be insalled for functiong of the pyvisa packeges
-lab one from zurich onstruments has to be instlled for loking aplifyes controls
+**Install the following drivers from the official sources:**
+- Piezo Stage (Mad Piezo drivers and Nano Drive software).
+- Lock-in Amplifier (Zurich Instruments LabOne software).
+- NI VISA for the functionality of the pyvisa package, which is required for communicating with the lock-in amplifier.
 
-connect the laser. use the guidlines from the m squared company.
-but remember that you will need to set up static ip for the laser controls. follow - https://pureinfotech.com/set-static-ip-address-windows-10/
+**Following has to be configured manually:**
+- Lasers (M Squared). You will need to [configure](https://pureinfotech.com/set-static-ip-address-windows-10/) a static IP address for the laser control system.
+- Mirror Correction Motor (Newport TRA6CC and CONEX-CC). To use these units you need to install [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48).
+
+***Important Notes for .NET Integration:***
+
+- Do not install `clr` or `pythonnet` from pip.
+
+- Install the appropriate pythonnet version manually using a precompiled wheel from this repo.
+
+
+
+
+
 
 ## Running
+To launch the GUI, use one of the following files:
 
-To run gui `run.py` (with console) or `run_no_console.pyw` (without console) files should be used.
+- `Main.py` (runs with a console)
+- `Main.pyw` (runs without a console)
 
 ## Examples
 
 ### Imaging
 
-![Imaging](/Examples/imaging_2_speed_x3.gif "Imaging example, speed x3")
+![Imaging](./Examples/imaging_2_speed_x3.gif "Imaging example, speed x3")
+
 
 ### Spectroscopy
 
-![Spectroscopy](/Examples/spectroscopy_1_speed_x7.gif "Spectroscopy example, speed x7")
+![Spectroscopy](./Examples/spectroscopy_1_speed_x7.gif "Spectroscopy example, speed x7")
