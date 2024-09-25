@@ -2,10 +2,9 @@ import os, sys
 from pathlib import Path
 
 # add parent dir to Python search path
-_directory = Path(__file__).resolve()
-_parent_dir = _directory.parent
-_parent_parent_dit = _parent_dir.parent
-# sys.path.append(_parent_dir)
+current_dir = Path(__file__).resolve()
+src_dir = current_dir.parent
+repo_dir = src_dir.parent
 
 import tkinter as tk
 from GUI import PiezoManipulation
@@ -21,9 +20,8 @@ def on_closing():
         root.destroy()
 # =============================================================================
 
-# try:
 root = tk.Tk()
-root.iconphoto(False, tk.PhotoImage(file=str(_parent_parent_dit / "docs" / "laser.png")))
+root.iconphoto(False, tk.PhotoImage(file=str(repo_dir / "docs" / "laser.png")))
 root.title("Laser/Piezo manipulator")
 root.resizable(0, 0)
 root.protocol("WM_DELETE_WINDOW", on_closing)
@@ -36,6 +34,3 @@ piezo_gui.grid(column=0,
                 sticky="NSEW")
 
 root.mainloop()
-    
-# except Exception:
-#     root.destroy()

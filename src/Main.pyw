@@ -1,12 +1,13 @@
-import os, sys, path
+import os, sys
+from pathlib import Path
 
 # add parent dir to Python search path
-_directory = path.Path(__file__).abspath()
-_parent_dir = _directory.parent
-sys.path.append(_parent_dir)
+current_dir = Path(__file__).resolve()
+src_dir = current_dir.parent
+repo_dir = src_dir.parent
 
 import tkinter as tk
-from gui_classes.piezo_gui import PiezoManipulation
+from GUI import PiezoManipulation
 
 # ============================== FUNCTIONS ==================================== 
 def on_closing():
@@ -19,22 +20,17 @@ def on_closing():
         root.destroy()
 # =============================================================================
 
-try:
-    root = tk.Tk()
-    root.iconphoto(False, tk.PhotoImage(file=_parent_dir + os.sep + 
-    "images" + os.sep + "laser.png"))
-    root.title("Laser/Piezo manipulator")
-    root.resizable(0, 0)
-    root.protocol("WM_DELETE_WINDOW", on_closing)
-    root.columnconfigure(0, weight=1)
-    root.rowconfigure(0, weight=1)
-    
-    piezo_gui = PiezoManipulation(root)
-    piezo_gui.grid(column=0,
-                   row=0, 
-                   sticky="NSEW")
-    
-    root.mainloop()
-    
-except Exception:
-    root.destroy()
+root = tk.Tk()
+root.iconphoto(False, tk.PhotoImage(file=str(repo_dir / "docs" / "laser.png")))
+root.title("Laser/Piezo manipulator")
+root.resizable(0, 0)
+root.protocol("WM_DELETE_WINDOW", on_closing)
+root.columnconfigure(0, weight=1)
+root.rowconfigure(0, weight=1)
+
+piezo_gui = PiezoManipulation(root)
+piezo_gui.grid(column=0,
+                row=0, 
+                sticky="NSEW")
+
+root.mainloop()

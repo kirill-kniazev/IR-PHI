@@ -11,7 +11,8 @@ A simple gui that manipulates infrared photothermal heterodyne imaging (IR-PHI) 
 
 To run gui correctly these python packages must be installed prior running from 'requirements.txt'
 
-.NET Framework 4.8 is required
+.NET Framework 4.8 is required https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48
+MadCity Lab piezo stage drivers
 
 ## Running
 
