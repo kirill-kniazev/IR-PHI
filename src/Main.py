@@ -1,10 +1,8 @@
 import os, sys
 from pathlib import Path
 
-# add parent dir to Python search path
-current_dir = Path(__file__).resolve()
-src_dir = current_dir.parent
-repo_dir = src_dir.parent
+# get repo directory for future reference
+repo_dir = Path(__file__).resolve().parent.parent
 
 import tkinter as tk
 from GUI import PiezoManipulation
@@ -22,7 +20,7 @@ def on_closing():
 
 root = tk.Tk()
 root.iconphoto(False, tk.PhotoImage(file=str(repo_dir / "docs" / "laser.png")))
-root.title("Laser/Piezo manipulator")
+root.title("IR-PHI GUI")
 root.resizable(0, 0)
 root.protocol("WM_DELETE_WINDOW", on_closing)
 root.columnconfigure(0, weight=1)

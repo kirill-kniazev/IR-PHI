@@ -3,10 +3,8 @@ from pathlib import Path
 
 from datetime import datetime
 
-# add parent dir to Python search path
-_directory = Path(__file__).resolve()
-_parent_dir = _directory.parent
-_parent_parent_dit = _parent_dir.parent
+# get repo directory for future reference
+repo_dir = Path(__file__).resolve().parent.parent
 
 # tkinter
 import tkinter as tk
@@ -107,7 +105,7 @@ class PiezoManipulation(tk.Frame):
         self.rowconfigure(1, weight=1)
         
         #* IMAGES
-        self.logo = tk.PhotoImage(file=str(_parent_parent_dit / 
+        self.logo = tk.PhotoImage(file=str(repo_dir / 
         "docs" / "path22064.png"))
         
         #!+++++++++++++++++++++++ GUI DESCRIPTION +++++++++++++++++++++++++++++
