@@ -1,4 +1,4 @@
-# IR-PHI laser manipulator
+# IR-PHI GUI
 <div align="center">
     <img src="laser.png" width="35%">
 </div>
