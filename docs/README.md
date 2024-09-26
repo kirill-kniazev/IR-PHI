@@ -3,7 +3,7 @@
     <img src="laser.png" width="35%">
 </div>
 
-A simple GUI application that controls the infrared photothermal heterodyne imaging (IR-PHI) system. 
+A simple graphic  user interface (GUI) application that controls the infrared photothermal heterodyne imaging (IR-PHI) system. 
 
 More information about the IR-PHI [technique](https://aip.scitation.org/doi/abs/10.1063/1.5142277), [applications](https://pubs.acs.org/doi/abs/10.1021/acs.est.1c05181), and [image restoration](https://pubs.aip.org/aip/jcp/article-abstract/155/21/214202/199981/Deep-image-restoration-for-infrared-photothermal?redirectedFrom=fulltext) can be found on the [web](https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=ir-phi&btnG=).
 
